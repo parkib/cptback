@@ -17,6 +17,17 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
+class StrokesModel:
+    _instance = None
+    def __init__(self):
+        self.model = None
+        self.dt = None
+        self.features = ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'alone']
+        self.target = 'stroke'
+        self.titanic_data = sns.load_dataset('titanic')
+        self.encoder = OneHotEncoder(handle_unknown='ignore')
+
+
 # Load the titanic dataset
 ## google drive link was used to allow pandas to access the csv file
 url='https://drive.google.com/file/d/1_lvLY-3rlNZoOkJiCVYZIsXF2eT_swf1/view?usp=sharing'
