@@ -9,8 +9,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
-class StrokeModel:
-    """The StrokeModel class represents the model being used to predict chance of stroke. 
+class TitanicModel:
+    """A class used to represent the Titanic Model for passenger survival prediction.
     """
     # a singleton instance of TitanicModel, created to train the model only once, while using it for prediction multiple times
     ## underbar in Python means that it is not for general use - you need to use another accessor to get to it (it will be assigned something if you use the system appropriately)
@@ -162,7 +162,7 @@ def testTitanic():
     print()
 
     # get an instance of the cleaned and trained Titanic Model
-    StrokeModel = StrokeModel.get_instance()
+    titanicModel = TitanicModel.get_instance()
     print(" Step 2:", titanicModel.get_instance.__doc__)
    
     # print the survival probability
