@@ -104,7 +104,7 @@ class TitanicModel:
                 'alone': Whether the passenger is alone (True or False)
 
         Returns:
-           dictionary : contains die and survive probabilities 
+        dictionary : contains die and survive probabilities 
         """
         # clean the passenger data
         passenger_df = pd.DataFrame(passenger, index=[0])
@@ -144,7 +144,7 @@ def testTitanic():
     Using the TitanicModel class, we can predict the survival probability of a passenger.
     Print output of this test contains method documentation, passenger data, survival probability, and survival weights.
     """
-     
+    
     # setup passenger data for prediction
     print(" Step 1:  Define theoritical passenger data for prediction: ")
     passenger = {
@@ -164,7 +164,7 @@ def testTitanic():
     # get an instance of the cleaned and trained Titanic Model
     titanicModel = TitanicModel.get_instance()
     print(" Step 2:", titanicModel.get_instance.__doc__)
-   
+    
     # print the survival probability
     print(" Step 3:", titanicModel.predict.__doc__)
     probability = titanicModel.predict(passenger)
