@@ -8,7 +8,6 @@ from flask.cli import AppGroup
 # import "packages" from "this" project
 from __init__ import app, db, cors  # Definitions initialization
 
-
 # setup APIs
 from api.covid import covid_api # Blueprint import api definition
 from api.joke import joke_api # Blueprint import api definition
@@ -25,7 +24,6 @@ from model.titanics import initTitanic
 # setup App pages
 from projects.projects import app_projects # Blueprint directory import projects definition
 
-
 # Initialize the SQLAlchemy object to work with the Flask app instance
 db.init_app(app)
 
@@ -37,7 +35,7 @@ app.register_blueprint(player_api)
 app.register_blueprint(stroke_api)
 app.register_blueprint(titanic_api)
 app.register_blueprint(app_projects)
- # register app pages
+# register app pages
 
 @app.errorhandler(404)  # catch for URL not found
 def page_not_found(e):
