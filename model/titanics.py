@@ -36,7 +36,6 @@ class TitanicModel:
     def _clean(self):
         # Drop unnecessary columns
         self.titanic_data.drop(['alive', 'who', 'adult_male', 'class', 'embark_town', 'deck'], axis=1, inplace=True)
-
         # Convert boolean columns to integers
         self.titanic_data['sex'] = self.titanic_data['sex'].apply(lambda x: 1 if x == 'male' else 0)
         self.titanic_data['alone'] = self.titanic_data['alone'].apply(lambda x: 1 if x == True else 0)
