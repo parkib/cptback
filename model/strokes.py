@@ -184,7 +184,7 @@ stroke_data['gender'] = stroke_data['gender'].apply(lambda x: 1 if x == 'Male' e
 
 # Encode categorical variables
 
-## onehotencode was not required for this data as there were only binary values for most variables
+## onehotencode was not required for this data as there weronly binary values for most variables
 ## enc = OneHotEncoder(handle_unknown='ignore')
 ## enc.fit(stroke_data[['embarked']])
 ## onehot = enc.transform(titanic_data[['embarked']]).toarray()
