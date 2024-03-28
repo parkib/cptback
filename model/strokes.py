@@ -25,7 +25,7 @@ class StrokesModel:
     def __init__(self):
         self.model = None
         self.dt = None
-        self.features = ['gender', 'age', 'hypertension', 'heart_disease', 'Residence_type', 'avg_glucose_level', 'bmi','smoking_status' ]
+        self.features = ['gender', 'age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi' ]
         self.target = 'stroke'
         self.stroke_data = pd.read_csv(url)
         #self.encoder = OneHotEncoder(handle_unknown='ignore')
@@ -33,12 +33,12 @@ class StrokesModel:
         # clean the titanic dataset, prepare it for training
     def _clean(self):
         # Drop unnecessary columns
-        self.stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
+        self.stroke_data.drop(['id', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'], axis=1, inplace=True)
 
         # Convert boolean columns to integers
         self.stroke_data['gender'] = self.stroke_data['gender'].apply(lambda x: 1 if x == 'male' else 0)
-        self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        #self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
 
         
         # Drop rows with missing values
@@ -95,8 +95,8 @@ class StrokesModel:
         # clean the passenger data
         individual_df = pd.DataFrame(individual, index=[0])
         individual_df['gender'] = individual_df['gender'].apply(lambda x: 1 if x == 'Male' else 0)
-        individual_df['Residence_type'] = individual_df['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        individual_df['smoking_status'] = individual_df['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #individual_df['Residence_type'] = individual_df['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        #individual_df['smoking_status'] = individual_df['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
         
         # predict the survival probability and extract the probabilities from numpy array
         stroke = np.squeeze(self.model.predict_proba(individual_df))
@@ -128,16 +128,15 @@ def testStroke():
     """
      
     # setup passenger data for prediction
+    #'Residence_type': ['Urban'],
     print(" Step 1:  Define theoritical passenger data for prediction: ")
     individual = {
         'gender': ['Make'],
         'age': [14],
         'hypertension': [1],
         'heart_disease': [1],
-        'Residence_type': ['Urban'],
         'avg_glucose_level': [24],
         'bmi': [18],
-        'smoking_status': ['smoked'],
     }
     print("\t", individual)
     print()
@@ -172,7 +171,7 @@ stroke_data = pd.read_csv(url)
 
 # Preprocess the data
 ## dropping the columns not necessary and relevant for the ML analysis
-stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
+stroke_data.drop(['id', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'], axis=1, inplace=True)
 
 ## dropping all NA values in dataset
 stroke_data.dropna(inplace=True)
@@ -180,8 +179,8 @@ stroke_data.dropna(inplace=True)
 ## convert all sex values to 0/1 (ML models can only process quantitative data)
 stroke_data['gender'] = stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
 #stroke_data['heart_disease'] = stroke_data['heart_disease'].apply(lambda x: 1 if x == 'Yes' else 0)
-stroke_data['Residence_type'] = stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-stroke_data['smoking_status'] = stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+#stroke_data['Residence_type'] = stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+#stroke_data['smoking_status'] = stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
 
 # Encode categorical variables
 

@@ -38,7 +38,7 @@ class StrokeModel:
         self.model = None
         self.dt = None
         # define ML features and target
-        self.features = ['gender', 'age', 'hypertension', 'heart_disease', 'Residence_type', 'avg_glucose_level', 'bmi','smoking_status' ]
+        self.features = ['gender', 'age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi' ]
         self.target = 'stroke'
         # load the titanic dataset
         url='https://drive.google.com/file/d/1_lvLY-3rlNZoOkJiCVYZIsXF2eT_swf1/view?usp=sharing'    
@@ -51,11 +51,11 @@ class StrokeModel:
     # clean the titanic dataset, prepare it for training
     def _clean(self):
         # Drop unnecessary columns
-        self.stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
+        self.stroke_data.drop(['id', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'], axis=1, inplace=True)
         self.stroke_data['gender'] = self.stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
         #self.stroke_data['alone'] = self.stroke_data['alone'].apply(lambda x: 1 if x == True else 0)
-        self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        #self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
         #self.stroke_data.dropna(subset=['embarked'], inplace=True)
         self.stroke_data.dropna(inplace=True)
 
@@ -111,8 +111,8 @@ class StrokeModel:
         # clean the passenger data
         individual_df = pd.DataFrame(individual, index=[0])
         individual_df['gender'] = individual_df['gender'].apply(lambda x: 1 if x == 'Male' else 0)
-        self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        #self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
         #individual_df['alone'] = individual_df['alone'].apply(lambda x: 1 if x == True else 0)
         #onehot = self.encoder.transform(passenger_df[['embarked']]).toarray()
         #cols = ['embarked_' + str(val) for val in self.encoder.categories_[0]]
