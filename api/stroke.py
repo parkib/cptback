@@ -51,33 +51,19 @@ class StrokeModel:
     # clean the titanic dataset, prepare it for training
     def _clean(self):
         # Drop unnecessary columns
-        self.stroke_data.drop(['alive', 'who', 'adult_male', 'class', 'embark_town', 'deck'], axis=1, inplace=True)
-
-        # Convert boolean columns to integers
-        self.stroke_data['sex'] = self.titanic_data['sex'].apply(lambda x: 1 if x == 'male' else 0)
-        self.stroke_data['alone'] = self.titanic_data['alone'].apply(lambda x: 1 if x == True else 0)
-
-        # Drop rows with missing 'embarked' values before one-hot encoding
-        self.stroke_data.dropna(subset=['embarked'], inplace=True)
-        
-        # One-hot encode 'embarked' column
-        onehot = self.encoder.fit_transform(self.titanic_data[['embarked']]).toarray()
-        cols = ['embarked_' + str(val) for val in self.encoder.categories_[0]]
-        onehot_df = pd.DataFrame(onehot, columns=cols)
-        self.titanic_data = pd.concat([self.titanic_data, onehot_df], axis=1)
-        self.titanic_data.drop(['embarked'], axis=1, inplace=True)
-
-        # Add the one-hot encoded 'embarked' features to the features list
-        self.features.extend(cols)
-        
-        # Drop rows with missing values
-        self.titanic_data.dropna(inplace=True)
+        self.stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
+        self.stroke_data['gender'] = self.stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
+        #self.stroke_data['alone'] = self.stroke_data['alone'].apply(lambda x: 1 if x == True else 0)
+        self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #self.stroke_data.dropna(subset=['embarked'], inplace=True)
+        self.stroke_data.dropna(inplace=True)
 
     # train the titanic model, using logistic regression as key model, and decision tree to show feature importance
     def _train(self):
         # split the data into features and target
-        X = self.titanic_data[self.features]
-        y = self.titanic_data[self.target]
+        X = self.stroke_data[self.features]
+        y = self.stroke_data[self.target]
         
         # perform train-test split
         self.model = LogisticRegression(max_iter=1000)
@@ -105,7 +91,7 @@ class StrokeModel:
         # return the instance, to be used for prediction
         return cls._instance
 
-    def predict(self, passenger):
+    def predict(self, individual):
         """ Predict the survival probability of a passenger.
 
         Args:
@@ -123,19 +109,21 @@ class StrokeModel:
            dictionary : contains die and survive probabilities 
         """
         # clean the passenger data
-        passenger_df = pd.DataFrame(passenger, index=[0])
-        passenger_df['sex'] = passenger_df['sex'].apply(lambda x: 1 if x == 'male' else 0)
-        passenger_df['alone'] = passenger_df['alone'].apply(lambda x: 1 if x == True else 0)
-        onehot = self.encoder.transform(passenger_df[['embarked']]).toarray()
-        cols = ['embarked_' + str(val) for val in self.encoder.categories_[0]]
-        onehot_df = pd.DataFrame(onehot, columns=cols)
-        passenger_df = pd.concat([passenger_df, onehot_df], axis=1)
-        passenger_df.drop(['embarked'], axis=1, inplace=True)
+        individual_df = pd.DataFrame(individual, index=[0])
+        individual_df['gender'] = individual_df['gender'].apply(lambda x: 1 if x == 'Male' else 0)
+        self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+        self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+        #individual_df['alone'] = individual_df['alone'].apply(lambda x: 1 if x == True else 0)
+        #onehot = self.encoder.transform(passenger_df[['embarked']]).toarray()
+        #cols = ['embarked_' + str(val) for val in self.encoder.categories_[0]]
+        #onehot_df = pd.DataFrame(onehot, columns=cols)
+        #passenger_df = pd.concat([passenger_df, onehot_df], axis=1)
+        #passenger_df.drop(['embarked'], axis=1, inplace=True)
         
         # predict the survival probability and extract the probabilities from numpy array
-        die, survive = np.squeeze(self.model.predict_proba(passenger_df))
+        stroke = np.squeeze(self.model.predict_proba(individual_df))
         # return the survival probabilities as a dictionary
-        return {'die': die, 'survive': survive}
+        return {'stroke percentage': stroke}
     
     def feature_weights(self):
         """Get the feature weights
@@ -149,8 +137,8 @@ class StrokeModel:
         # return the feature importances as a dictionary, using dictionary comprehension
         return {feature: importance for feature, importance in zip(self.features, importances)} 
 
-api = Api(titanic_api)
-class TitanicAPI:
+api = Api(stroke_api)
+class StrokeAPI:
     class _Predict(Resource):
         
         def post(self):
