@@ -68,4 +68,3 @@ y_pred = gnb.fit(X_train, y_train).predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 ## accuracy was approximatey 89%
 print('Accuracy:', accuracy)
-

@@ -25,7 +25,6 @@ from model.users import initUsers
 from model.players import initPlayers
 from model.titanics import initTitanic
 from model.heart import initHeart
-from model.strokes import initStroke
 
 # setup App pages
 from projects.projects import app_projects # Blueprint directory import projects definition
