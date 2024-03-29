@@ -14,151 +14,106 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
-import numpy as np
 
-stroke_api = Blueprint('stroke_api', __name__,
-                   url_prefix='/api/stroke')
-
-class StrokeModel:
-    """A class used to represent the Titanic Model for passenger survival prediction.
-    """
-    # a singleton instance of TitanicModel, created to train the model only once, while using it for prediction multiple times
-    ## underbar in Python means that it is not for general use - you need to use another accessor to get to it (it will be assigned something if you use the system appropriately)
-    _instance = None
-
-
-    ## creating + cleaning + training of the instance
-    
-    # constructor, used to initialize the TitanicModel
-    '''
-
-    '''
-    def __init__(self):
-        # the titanic ML model
-        self.model = None
-        self.dt = None
-        # define ML features and target
-        self.features = ['gender', 'age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi' ]
-        self.target = 'stroke'
-        # load the titanic dataset
-        url='https://drive.google.com/file/d/1_lvLY-3rlNZoOkJiCVYZIsXF2eT_swf1/view?usp=sharing'    
-        url='https://drive.google.com/uc?id=' + url.split('/')[-2]
-        self.stroke_data = pd.read_csv(url)
-        #self.titanic_data = sns.load_dataset('titanic')
-        # one-hot encoder used to encode 'embarked' column
-        #self.encoder = OneHotEncoder(handle_unknown='ignore')
-
-    # clean the titanic dataset, prepare it for training
-    def _clean(self):
-        # Drop unnecessary columns
-        self.stroke_data.drop(['id', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'], axis=1, inplace=True)
-        self.stroke_data['gender'] = self.stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
-        #self.stroke_data['alone'] = self.stroke_data['alone'].apply(lambda x: 1 if x == True else 0)
-        #self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        #self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
-        #self.stroke_data.dropna(subset=['embarked'], inplace=True)
-        self.stroke_data.dropna(inplace=True)
-
-    # train the titanic model, using logistic regression as key model, and decision tree to show feature importance
-    def _train(self):
-        # split the data into features and target
-        X = self.stroke_data[self.features]
-        y = self.stroke_data[self.target]
-        
-        # perform train-test split
-        self.model = LogisticRegression(max_iter=1000)
-        
-        # train the model
-        self.model.fit(X, y)
-        
-        # train a decision tree classifier
-        self.dt = DecisionTreeClassifier()
-        self.dt.fit(X, y)
-        
-    @classmethod
-    def get_instance(cls):
-        """ Gets, and conditionaly cleans and builds, the singleton instance of the TitanicModel.
-        The model is used for analysis on titanic data and predictions on the survival of theoritical passengers.
-        
-        Returns:
-            TitanicModel: the singleton _instance of the TitanicModel, which contains data and methods for prediction.
-        """        
-        # check for instance, if it doesn't exist, create it
-        if cls._instance is None:
-            cls._instance = cls()
-            cls._instance._clean()
-            cls._instance._train()
-        # return the instance, to be used for prediction
-        return cls._instance
-
-    def predict(self, individual):
-        """ Predict the survival probability of a passenger.
-
-        Args:
-            passenger (dict): A dictionary representing a passenger. The dictionary should contain the following keys:
-                'pclass': The passenger's class (1, 2, or 3)
-                'sex': The passenger's sex ('male' or 'female')
-                'age': The passenger's age
-                'sibsp': The number of siblings/spouses the passenger has aboard
-                'parch': The number of parents/children the passenger has aboard
-                'fare': The fare the passenger paid
-                'embarked': The port at which the passenger embarked ('C', 'Q', or 'S')
-                'alone': Whether the passenger is alone (True or False)
-
-        Returns:
-           dictionary : contains die and survive probabilities 
-        """
-        # clean the passenger data
-        individual_df = pd.DataFrame(individual, index=[0])
-        individual_df['gender'] = individual_df['gender'].apply(lambda x: 1 if x == 'Male' else 0)
-        #self.stroke_data['Residence_type'] = self.stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
-        #self.stroke_data['smoking_status'] = self.stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
-        #individual_df['alone'] = individual_df['alone'].apply(lambda x: 1 if x == True else 0)
-        #onehot = self.encoder.transform(passenger_df[['embarked']]).toarray()
-        #cols = ['embarked_' + str(val) for val in self.encoder.categories_[0]]
-        #onehot_df = pd.DataFrame(onehot, columns=cols)
-        #passenger_df = pd.concat([passenger_df, onehot_df], axis=1)
-        #passenger_df.drop(['embarked'], axis=1, inplace=True)
-        
-        # predict the survival probability and extract the probabilities from numpy array
-        stroke = np.squeeze(self.model.predict_proba(individual_df))
-        # return the survival probabilities as a dictionary
-        return {'stroke percentage': stroke}
-    
-    def feature_weights(self):
-        """Get the feature weights
-        The weights represent the relative importance of each feature in the prediction model.
-
-        Returns:
-            dictionary: contains each feature as a key and its weight of importance as a value
-        """
-        # extract the feature importances from the decision tree model
-        importances = self.dt.feature_importances_
-        # return the feature importances as a dictionary, using dictionary comprehension
-        return {feature: importance for feature, importance in zip(self.features, importances)} 
-
+app = Flask(__name__)
+stroke_api = Blueprint('stroke_api', __name__, url_prefix='/api/stroke')
 api = Api(stroke_api)
-class StrokeAPI:
-    class _Predict(Resource):
-        
-        def post(self):
-            """ Semantics: In HTTP, POST requests are used to send data to the server for processing.
-            Sending passenger data to the server to get a prediction fits the semantics of a POST request.
+
+class Predict(Resource):
+    def post(self):
+        try:
+            data = request.get_json()
+            stroke_data = pd.DataFrame(data, index=[0])
+            stroke_data.head(5)
             
-            POST requests send data in the body of the request...
-            1. which can handle much larger amounts of data and data types, than URL parameters
-            2. using an HTTPS request, the data is encrypted, making it more secure
-            3. a JSON formated body is easy to read and write between JavaScript and Python, great for Postman testing
-            """     
-            # Get the passenger data from the request
-            individual = request.get_json()
+            # Preprocesssing
+            #stroke_data['gender'] = stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
+            #passenger_data['alone'] = passenger_data['alone'].apply(lambda x: 1 if x == True else 0)
 
-            # Get the singleton instance of the TitanicModel
-            strokeModel = StrokeModel.get_instance()
-            # Predict the survival probability of the passenger
-            response = strokeModel.predict(individual)
+            #stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
 
-            # Return the response as JSON
-            return jsonify(response)
+            ## dropping all NA values in dataset
+            stroke_data.dropna(inplace=True)
+            ## convert all sex values to 0/1 (ML models can only process quantitative data)
+            stroke_data['gender'] = stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
+            #stroke_data['heart_disease'] = stroke_data['heart_disease'].apply(lambda x: 1 if x == 'Yes' else 0)
+            stroke_data['Residence_type'] = stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+            stroke_data['smoking_status'] = stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
 
-    api.add_resource(_Predict, '/predict')
+            #onehot = enc.transform(passenger_data[['embarked']]).toarray()
+            #cols = ['embarked_' + val for val in enc.categories_[0]]
+            #passenger_data[cols] = pd.DataFrame(onehot)
+            #passenger_data.drop(['embarked'], axis=1, inplace=True)
+            
+            # Predict the survival probability for the new passenger using a gaussian naive bayes model
+            stroke_prob = gnb.predict_proba(stroke_data)[:, 1]
+            #stroke_prob = 1 - survival_prob
+
+            ## returns a percentage of the chance of stroke for each individual
+            return {'Chance of Stroke': float(stroke_prob * 100)}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+## api endpoint
+api.add_resource(Predict, '/predict')
+
+# Load the stroke dataset
+url='https://drive.google.com/file/d/1_lvLY-3rlNZoOkJiCVYZIsXF2eT_swf1/view?usp=sharing'
+url='https://drive.google.com/uc?id=' + url.split('/')[-2]
+stroke_data = pd.read_csv(url)
+
+# Preprocess the data
+## dropping the columns of the dataframe for the id, marriage, and work_type
+stroke_data.drop(['id', 'ever_married', 'work_type'], axis=1, inplace=True)
+
+## dropping all NA values in dataset
+stroke_data.dropna(inplace=True)
+
+## convert all sex values to 0/1 (ML models can only process quantitative data)
+stroke_data['gender'] = stroke_data['gender'].apply(lambda x: 1 if x == 'Male' else 0)
+#stroke_data['heart_disease'] = stroke_data['heart_disease'].apply(lambda x: 1 if x == 'Yes' else 0)
+
+## convert all residence and smoking status values to 0/1 (ML models can only process quantitative data)
+stroke_data['Residence_type'] = stroke_data['Residence_type'].apply(lambda x: 1 if x == 'Urban' else 0)
+stroke_data['smoking_status'] = stroke_data['smoking_status'].apply(lambda x: 1 if x == 'smoked' else 0)
+
+# Encode categorical variables
+
+## onehotencode was not required for this data as there were only binary values for most variables
+## enc = OneHotEncoder(handle_unknown='ignore')
+## enc.fit(stroke_data[['embarked']])
+## onehot = enc.transform(titanic_data[['embarked']]).toarray()
+## cols = ['embarked_' + val for val in enc.categories_[0]]
+## titanic_data[cols] = pd.DataFrame(onehot)
+## titanic_data.drop(['embarked'], axis=1, inplace=True)
+##titanic_data.dropna(inplace=True)
+
+# Split the data into training and testing sets
+X = stroke_data.drop('stroke', axis=1)
+y = stroke_data['stroke']
+
+# Train a decision tree classifier
+#dt = DecisionTreeClassifier()
+#dt.fit(X_train, y_train)
+
+# Test the model
+#y_pred = dt.predict(X_test)
+
+## slightly lower accuracies
+# Split the data into features and target
+X = stroke_data.drop('stroke', axis=1)
+y = stroke_data['stroke']
+
+# Train the logistic regression model
+#logreg = LogisticRegression()
+#regr = svm.SVR()
+#regr.fit(X, y)
+
+## gaussian naive bayes was tested instead of the original model and it ended up having a slightly lower accuracy
+gnb = GaussianNB()
+y_pred = gnb.fit(X, y).predict(X)
+
+#accuracy = accuracy_score(y_test, y_pred)
+#print('Accuracy:', accuracy)
+
+#logreg.fit(X, y)
