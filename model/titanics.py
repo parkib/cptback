@@ -12,7 +12,7 @@ import seaborn as sns
 class TitanicModel:
     """A class used to represent the Titanic Model for passenger survival prediction.
     """
-    # a singleton instance of TitanicModel, created to train the model only once, while using it for prediction multiple times
+    #A single instance of the TitanicModel, designed to train the model once and use it for multiple predictions.
     ## underbar in Python means that it is not for general use - you need to use another accessor to get to it (it will be assigned something if you use the system appropriately)
     _instance = None
 
@@ -56,7 +56,8 @@ class TitanicModel:
         # Drop rows with missing values
         self.titanic_data.dropna(inplace=True)
 
-    # train the titanic model, using logistic regression as key model, and decision tree to show feature importance
+    
+# train the Titanic model using logistic regression as the primary model, and decision trees to demonstrate feature importance.
     def _train(self):
         # split the data into features and target
         X = self.titanic_data[self.features]
@@ -115,7 +116,7 @@ class TitanicModel:
         passenger_df = pd.concat([passenger_df, onehot_df], axis=1)
         passenger_df.drop(['embarked', 'name'], axis=1, inplace=True)
         
-        # predict the survival probability and extract the probabilities from numpy array
+        # predict the survival probability and get the probabilities from numpy array
         die, survive = np.squeeze(self.model.predict_proba(passenger_df))
         # return the survival probabilities as a dictionary
         return {'die': die, 'survive': survive}
@@ -129,7 +130,7 @@ class TitanicModel:
         """
         # extract the feature importances from the decision tree model
         importances = self.dt.feature_importances_
-        # return the feature importances as a dictionary, using dictionary comprehension
+        # return the feature importances as a dictionary using dictionary comprehension.
         return {feature: importance for feature, importance in zip(self.features, importances)} 
     
 def initTitanic():
