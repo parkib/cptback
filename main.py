@@ -3,7 +3,11 @@ import flask
 # import "packages" from flask
 from flask import render_template,request  # import render_template from "public" flask libraries
 from flask.cli import AppGroup
+from flask import Flask
+from flask_cors import CORS
 
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:4100"}})
 
 # import "packages" from "this" project
 from __init__ import app, db, cors  # Definitions initialization
@@ -15,11 +19,12 @@ from api.user import user_api # Blueprint import api definition
 from api.player import player_api
 from api.stroke import stroke_api
 from api.titanic import titanic_api
+from api.heart import heart_api
 # database migrations
 from model.users import initUsers
 from model.players import initPlayers
 from model.titanics import initTitanic
-#from model.strokes import init
+from model.heart import initHeart
 
 # setup App pages
 from projects.projects import app_projects # Blueprint directory import projects definition
@@ -34,6 +39,7 @@ app.register_blueprint(user_api) # register api routes
 app.register_blueprint(player_api)
 app.register_blueprint(stroke_api)
 app.register_blueprint(titanic_api)
+app.register_blueprint(heart_api)
 app.register_blueprint(app_projects)
 # register app pages
 
@@ -66,11 +72,11 @@ def generate_data():
     initUsers()
     initPlayers()
     initTitanic()
+    initHeart()
 
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)
         
 # this runs the application on the development server
 if __name__ == "__main__":
-    # change name for testing
     app.run(debug=True, host="0.0.0.0", port="8086")
