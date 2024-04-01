@@ -98,7 +98,6 @@ class HeartAPI:
                     response[key] = value.tolist()
             # Return the prediction response as JSON
             return jsonify(response)
-
     # Add the _Predict resource to the heart_api with the '/predict' endpoint
     api.add_resource(_Predict, '/predict')
 
