@@ -12,7 +12,7 @@ import seaborn as sns
 class TitanicModel:
     """A class used to represent the Titanic Model for passenger survival prediction.
     """
-    # a singleton instance of TitanicModel, created to train the model only once, while using it for prediction multiple times
+    #A single instance of the TitanicModel, designed to train the model once and use it for multiple predictions.
     ## underbar in Python means that it is not for general use - you need to use another accessor to get to it (it will be assigned something if you use the system appropriately)
     _instance = None
 
@@ -56,7 +56,8 @@ class TitanicModel:
         # Drop rows with missing values
         self.titanic_data.dropna(inplace=True)
 
-    # train the titanic model, using logistic regression as key model, and decision tree to show feature importance
+    
+# train the Titanic model using logistic regression as the primary model, and decision trees to demonstrate feature importance.
     def _train(self):
         # split the data into features and target
         X = self.titanic_data[self.features]
@@ -115,7 +116,7 @@ class TitanicModel:
         passenger_df = pd.concat([passenger_df, onehot_df], axis=1)
         passenger_df.drop(['embarked', 'name'], axis=1, inplace=True)
         
-        # predict the survival probability and extract the probabilities from numpy array
+        # predict the survival probability and get the probabilities from numpy array
         die, survive = np.squeeze(self.model.predict_proba(passenger_df))
         # return the survival probabilities as a dictionary
         return {'die': die, 'survive': survive}
@@ -129,7 +130,7 @@ class TitanicModel:
         """
         # extract the feature importances from the decision tree model
         importances = self.dt.feature_importances_
-        # return the feature importances as a dictionary, using dictionary comprehension
+        # return the feature importances as a dictionary using dictionary comprehension.
         return {feature: importance for feature, importance in zip(self.features, importances)} 
     
 def initTitanic():
@@ -188,6 +189,7 @@ titanic_data.drop(['alive', 'who', 'adult_male', 'class', 'embark_town', 'deck']
 titanic_data.dropna(inplace=True)
 titanic_data['sex'] = titanic_data['sex'].apply(lambda x: 1 if x == 'male' else 0)
 titanic_data['alone'] = titanic_data['alone'].apply(lambda x: 1 if x == True else 0)
+
 # Encode categorical variables
 enc = OneHotEncoder(handle_unknown='ignore')
 enc.fit(titanic_data[['embarked']])
@@ -196,10 +198,12 @@ cols = ['embarked_' + val for val in enc.categories_[0]]
 titanic_data[cols] = pd.DataFrame(onehot)
 titanic_data.drop(['embarked'], axis=1, inplace=True)
 titanic_data.dropna(inplace=True)
+
 # Split the data into training and testing sets
 X = titanic_data.drop('survived', axis=1)
 y = titanic_data['survived']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
 # Train a decision tree classifier
 dt = DecisionTreeClassifier()
 dt.fit(X_train, y_train)
