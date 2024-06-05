@@ -1,74 +1,179 @@
-# Flask Portfolio Starter
+# Backend for Medical Prediction Models
 
-Use this project to create a Flask Servr.
+Welcome to the backend repository for our medical prediction models. This project provides the API and core logic for three machine learning models: stroke detection, heart attack prediction, and Titanic survival prediction. The backend handles data processing, model inference, and serves predictions to the frontend.
 
-Runtime link: <https://flask.nighthawkcodingsociety.com/>
-GitHub link: https://github.com/nighthawkcoders/flask_portfolio
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Model Details](#model-details)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Conventional way to get started
+## Overview
 
-> Quick steps that can be used with MacOS, WSL Ubuntu, or Ubuntu; this uses Python 3.9 or later as a prerequisite.
+This backend application provides RESTful APIs for interacting with three different machine learning models:
+1. **Stroke Detection**: Predicts the likelihood of a stroke based on user input data.
+2. **Heart Attack Prediction**: Estimates the risk of a heart attack using relevant health metrics.
+3. **Titanic Survival Prediction**: Predicts the chances of survival on the Titanic given certain passenger details.
 
-- Open a Terminal, clone project and cd to project area
+## Features
 
-```bash
-mkdir ~/vscode; cd ~/vscode
+- **RESTful API**: Provides endpoints for making predictions with the machine learning models.
+- **Data Validation**: Ensures input data is valid and clean before making predictions.
+- **Scalable Architecture**: Designed to handle multiple requests and scale efficiently.
 
-git clone https://github.com/nighthawkcoders/flask_portfolio.git
+## Installation
 
-cd flask_portfolio
-```
+### Prerequisites
 
-- Install python dependencies for Flask, etc.
+- Python 3.8 or higher
+- pip (Python package installer)
+- Virtual environment (optional but recommended)
 
-```bash
-pip install -r requirements.txt
-```
+### Steps
 
-- Run from Terminal without VSCode
-
-  - Setup database and init data
-  
-  ```bash
-    ./migrate.sh
+1. **Clone the Repository**:
+    ```sh
+    git clone https://github.com/yourusername/medical-prediction-backend.git
+    cd medical-prediction-backend
     ```
 
-  - Run python server from command line without VSCode
-
-    ```bash
-    python main.py
+2. **Create a Virtual Environment** (optional but recommended):
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
 
-### Open project in VSCode
-
-- Prepare VSCode and run
-
-  - From Terminal run VSCode
-
-    ```bash
-    code .
+3. **Install Dependencies**:
+    ```sh
+    pip install -r requirements.txt
     ```
 
-  - Open Setting: Ctl-Shift P or Cmd-Shift
-    - Search Python: Select Interpreter
-    - Match interpreter to `which python` from terminal
+4. **Start the Server**:
+    ```sh
+    python app.py
+    ```
 
-  - Select main.py and Play button
-  - Try Play button and try to Debug
+The backend server should now be running on `http://localhost:5000`.
 
-## Idea
+## Usage
 
-> The purpose of project is to serve APIs.  It is the backend piece of a Full-Stack project.  Review `api` folder in project for endpoints.
+The backend provides endpoints for making predictions with each model. Below are the details for each endpoint.
 
-### Visual thoughts
+## API Endpoints
 
-> The Starter code should be fun and practical.
+1. **Stroke Detection**:
+    - **Endpoint**: `/predict/stroke`
+    - **Method**: `POST`
+    - **Request Body**:
+        ```json
+        {
+            "age": 67,
+            "hypertension": 0,
+            "heart_disease": 1,
+            "ever_married": "Yes",
+            "work_type": "Private",
+            "residence_type": "Urban",
+            "avg_glucose_level": 228.69,
+            "bmi": 36.6,
+            "smoking_status": "formerly smoked"
+        }
+        ```
+    - **Response**:
+        ```json
+        {
+            "prediction": "No Stroke",
+            "confidence": 0.85
+        }
+        ```
 
-- Organize with Bootstrap menu
-- Add some color and fun through VANTA Visuals (birds, halo, solar, net)
-- Show some practical and fun links (hrefs) like Twitter, Git, Youtube
-- Build a Sample Page (Table)
-- Show project specific links (hrefs) per page
+2. **Heart Attack Prediction**:
+    - **Endpoint**: `/predict/heart-attack`
+    - **Method**: `POST`
+    - **Request Body**:
+        ```json
+        {
+            "age": 57,
+            "sex": 1,
+            "cp": 0,
+            "trestbps": 140,
+            "chol": 192,
+            "fbs": 0,
+            "restecg": 1,
+            "thalach": 148,
+            "exang": 0,
+            "oldpeak": 0.4
+        }
+        ```
+    - **Response**:
+        ```json
+        {
+            "prediction": "Low Risk",
+            "confidence": 0.78
+        }
+        ```
+
+3. **Titanic Survival Prediction**:
+    - **Endpoint**: `/predict/titanic`
+    - **Method**: `POST`
+    - **Request Body**:
+        ```json
+        {
+            "age": 29,
+            "sex": "male",
+            "pclass": 1,
+            "siblings_spouses_aboard": 0,
+            "parents_children_aboard": 0,
+            "fare": 100
+        }
+        ```
+    - **Response**:
+        ```json
+        {
+            "prediction": "Survived",
+            "confidence": 0.92
+        }
+        ```
+
+## Model Details
+
+### Stroke Detection Model
+
+- **Input Features**: Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Type, Average Glucose Level, BMI, Smoking Status.
+- **Algorithm**: Logistic Regression / Random Forest / Other (Specify the algorithm used).
+
+### Heart Attack Prediction Model
+
+- **Input Features**: Age, Sex, Chest Pain Type, Resting Blood Pressure, Cholesterol, Fasting Blood Sugar, Resting ECG, Maximum Heart Rate Achieved, Exercise Induced Angina, ST Depression.
+- **Algorithm**: Support Vector Machine / Decision Tree / Other (Specify the algorithm used).
+
+### Titanic Survival Prediction Model
+
+- **Input Features**: Age, Gender, Passenger Class, Siblings/Spouses Aboard, Parents/Children Aboard, Fare.
+- **Algorithm**: Decision Tree / K-Nearest Neighbors / Other (Specify the algorithm used).
+
+## Contributing
+
+We welcome contributions to improve the project. To contribute, follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes and commit them (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature-branch`).
+5. Create a new Pull Request.
+
+Please ensure your code follows our coding conventions and is well-documented.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+Feel free to open issues or contact us if you have any questions or need further assistance. Happy coding!
 
 ### Files and Directories in this Project
 
